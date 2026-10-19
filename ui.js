@@ -1,0 +1,10 @@
+const $=id=>document.getElementById(id);let state={active:0,tabs:[]};
+function render(s){state=s;$('tabs').replaceChildren();s.tabs.forEach((t,i)=>{const b=document.createElement('button');b.className='tab'+(i===s.active?' active':'');b.textContent=(t.loading?'◌ ':'')+(t.title||'New Tab');b.title=t.url;const c=document.createElement('span');c.className='close';c.textContent='×';c.addEventListener('click',e=>{e.stopPropagation();ghost.close(i)});b.append(c);b.addEventListener('click',()=>ghost.activate(i));$('tabs').append(b);});$('address').value=s.tabs[s.active]?.url||'';}
+ghost.onTabs(render);
+$('add').onclick=()=>ghost.newTab();$('back').onclick=()=>ghost.nav('back');$('forward').onclick=()=>ghost.nav('forward');$('reload').onclick=()=>ghost.nav('reload');
+$('address').addEventListener('keydown',e=>{if(e.key==='Enter'){$('address').blur();ghost.go(e.target.value)} });
+$('ext').onclick=()=>{$('panel').hidden=!$('panel').hidden;if(!$('panel').hidden)refresh()};$('hide').onclick=()=>$('panel').hidden=true;
+async function refresh(){const list=await ghost.extensions();$('installed').replaceChildren();for(const e of list){const line=document.createElement('div');const name=document.createElement('span');name.textContent=e.name+' · '+e.version;const rm=document.createElement('button');rm.textContent='Remove';rm.onclick=async()=>{await ghost.removeExtension(e.id);refresh()};line.append(name,rm);$('installed').append(line);}}
+$('install').onclick=async()=>{$('status').textContent='Downloading extension…';try{const e=await ghost.installId($('extid').value.trim());$('status').textContent='Installed '+e.name;refresh()}catch(e){$('status').textContent='Could not install: '+e.message}};
+$('folder').onclick=async()=>{try{const e=await ghost.installFolder();$('status').textContent=e?'Loaded '+e.name:'Cancelled';refresh()}catch(e){$('status').textContent=e.message}};
+document.addEventListener('keydown',e=>{if(e.metaKey&&e.key==='t'){e.preventDefault();ghost.newTab()}if(e.metaKey&&e.key==='l'){e.preventDefault();$('address').focus();$('address').select()}if(e.metaKey&&e.key==='w'){e.preventDefault();ghost.close(state.active)}});

@@ -1,0 +1,19 @@
+{
+  "name": "ghost-browser-mac",
+  "version": "0.1.0",
+  "description": "Minimal Apple Silicon browser with experimental Chrome extension installation",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac dmg --arm64"
+  },
+  "dependencies": {"adm-zip":"^0.5.16"},
+  "devDependencies": {"electron":"^35.0.0","electron-builder":"^26.0.0"},
+  "build": {
+    "appId":"dev.ghost.browser",
+    "productName":"Ghost Browser",
+    "asar":true,
+    "mac":{"target":[{"target":"dmg","arch":["arm64"]}],"category":"public.app-category.productivity"},
+    "files":["src/**/*","package.json"]
+  }
+}
